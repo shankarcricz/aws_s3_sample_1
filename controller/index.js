@@ -60,8 +60,23 @@ exports.resizePhoto = async (req, res, next) => {
 exports.uploadPhoto = upload.single("photo");
 
 
-exports.deletePhoto = (req, res, next) => {
-  fs.unlink('./public/images/user-55e011b1-0436-49d3-89eb-b2adb169918f+1709780851549.png', (err) => {
+const path = require('path');
+
+
+exports.deleteBucket = async (req, res, next) => {
+    const deletedBucket = await bucket.deleteOne({name : req.body.bucketId});
+    console.log('Directory deleted successfully.');
+    res.json({
+      status : 'success',
+      deletedBucket
+    });
+}
+
+exports.deletePhoto = async (req, res, next) => {
+  const object = await Object.findByIdAndDelete(req.body.obj_id);
+  // const buc = await bucket.find({name : object?.bucketId});
+  console.log(object)
+  fs.unlink(`./public/images/${object?.photo}`, (err) => {  //need bucket id as well
     if(err) {
       res.json({
         data: 'error'
@@ -69,7 +84,8 @@ exports.deletePhoto = (req, res, next) => {
       return;
     }
     res.json({
-      data: 'success'
+      data: 'success',
+      object : object
     })
   })
 }
@@ -84,7 +100,7 @@ exports.fetchObjectById = async(req, res, next) => {
 }
 
 exports.createBucket = async (req, res, next) => {
-
+  
   const buck = await bucket.find();
   const buckt = await bucket.create({
     name : `b-${buck.length+1}`,
