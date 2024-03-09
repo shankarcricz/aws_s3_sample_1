@@ -47,8 +47,8 @@ exports.resizePhoto = async (req, res, next) => {
 
   let bt = await bucket.find({name : req.body.bucket});
   console.log(bt);
-  bt[0].objects.push(object._id);
-  await bt[0].save({validateBeforeSave : false});
+  bt[0]?.objects.push(object._id);
+  await bt[0]?.save({validateBeforeSave : false});
   // const bt = await bucket.find({name : req.body.bucket}).populate('objects').populate({path : 'Object', select : '_id'})
   res.json({
     data: 'success',
@@ -64,7 +64,9 @@ const path = require('path');
 
 
 exports.deleteBucket = async (req, res, next) => {
+  console.log(req.body)
     const deletedBucket = await bucket.deleteOne({name : req.body.bucketId});
+    const objs = await Object.deleteMany({bucketId : req.body.bucketId});
     console.log('Directory deleted successfully.');
     res.json({
       status : 'success',
@@ -73,6 +75,8 @@ exports.deleteBucket = async (req, res, next) => {
 }
 
 exports.deletePhoto = async (req, res, next) => {
+  console.log(req.body)
+
   const object = await Object.findByIdAndDelete(req.body.obj_id);
   // const buc = await bucket.find({name : object?.bucketId});
   console.log(object)
@@ -100,25 +104,25 @@ exports.fetchObjectById = async(req, res, next) => {
 }
 
 exports.createBucket = async (req, res, next) => {
-  
   const buck = await bucket.find();
-  const buckt = await bucket.create({
-    name : `b-${buck.length+1}`,
-    bucketId : `b`
-  })
-  !(fs.existsSync(`./public/images/${buck.length+1}`)) &&
-    fs.mkdir(`./public/images/b-${buck.length+1}`, { recursive: true }, (err) => {
-      if (err) {
-        console.error('Error creating directory:', err);
-        return;
-      }
-      console.log('Directory created successfully');
-    });
-   res.json({
-    status : 'success',
-    bucket : buckt
-   })
-
+  const bool = await bucket.find({name : `b-${buck.length+1}`}) 
+  let count = buck.length+1;
+    const buckt = await bucket.create({
+      name : `b-${buck.length+1}`,
+      bucketId : `b`
+    })
+    !(fs.existsSync(`./public/images/${buck.length+1}`)) &&
+      fs.mkdir(`./public/images/b-${buck.length+1}`, { recursive: true }, (err) => {
+        if (err) {
+          console.error('Error creating directory:', err);
+          return;
+        }
+        console.log('Directory created successfully');
+      });
+     res.json({
+      status : 'success',
+      bucket : buckt
+     })
 }
 
 exports.fetchBuckets = async (req, res, next) => {
@@ -131,6 +135,7 @@ exports.fetchBuckets = async (req, res, next) => {
 
 exports.fetchObjectsByBucketId = async (req, res, next) => {
  const objects = await Object.find({bucketId : req.body.b_id});
+ console.log(objects)
  res.json(
   {
     objects : objects,
