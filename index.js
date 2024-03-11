@@ -4,8 +4,8 @@ const cors = require('cors');
 const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const putRouter = require('./routes/putRouter');
 const app = express();
+const Objectrouter = require('./routes/Objectrouter')
 
 mongoose.connect(`mongodb+srv://shankarsddvv:BOGl8Ahh6TkuWPaZ@cluster0.n1g2l8w.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
 .then((res) => console.log('connected'))
@@ -21,4 +21,4 @@ app.listen(PORT, () => {
 })
 
 
-app.use('/putObject',putRouter);
+app.use('/Object',Objectrouter);
