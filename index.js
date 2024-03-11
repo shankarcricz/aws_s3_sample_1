@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cors());
-const PORT = 3000
+const PORT = 3001
 app.listen(PORT, () => {
     console.log('Server started');
 })
